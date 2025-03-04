@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SourceViewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        #sourceContainer {
+            width: 90%;
+            margin: 20px auto;
+            text-align: left;
+        }
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        code {
+            display: block;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+</head>
+<body>
+    <h2>SourceViewer</h2>
+    <input type="text" id="urlInput" placeholder="Enter website URL" size="50">
+    <button onclick="fetchSourceCode()">Get Source Code</button>
+    <div id="sourceContainer">
+        <pre><code id="sourceCode" class="html"></code></pre>
+    </div>
+    
+    <script>
+        async function fetchSourceCode() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) {
+                alert('Enter a valid URL');
+                return;
+            }
+            
+            const proxy = 'https://api.allorigins.win/raw?url=';
+            const fetchUrl = proxy + encodeURIComponent(url);
+            
+            try {
+                const response = await fetch(fetchUrl);
+                if (!response.ok) throw new Error('Failed to get the code');
+                
+                const text = await response.text();
+                const sourceCodeElement = document.getElementById('sourceCode');
+                sourceCodeElement.textContent = text;
+                hljs.highlightElement(sourceCodeElement);
+                
+                document.getElementById('sourceContainer').style.height = 'auto';
+            } catch (error) {
+                alert('Smth wrong: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
