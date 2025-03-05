@@ -6,41 +6,91 @@
     <title>SourceViewer</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             text-align: center;
-            margin: 20px;
-            background-color: #f4f4f4;
+            margin: 0;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            justify-content: center;
         }
-        input, button {
-            padding: 10px;
-            margin: 10px;
+        h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #00ffcc;
+        }
+        input {
+            padding: 12px;
+            width: 60%;
+            max-width: 500px;
+            border-radius: 8px;
+            border: none;
             font-size: 16px;
+            background: #333;
+            color: #fff;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus {
+            border: 2px solid #00ffcc;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #00ffcc, #0077ff);
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0, 255, 204, 0.4);
         }
         #sourceContainer {
-            width: 90%;
-            margin: 20px auto;
+            width: 80%;
+            max-width: 900px;
+            height: 400px;
+            margin-top: 20px;
+            background: #1e1e1e;
+            border-radius: 10px;
+            overflow: auto;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 255, 204, 0.2);
             text-align: left;
         }
         pre {
-            background: #282c34;
+            background: transparent;
             color: #abb2bf;
-            padding: 20px;
             white-space: pre-wrap;
             word-wrap: break-word;
-            border-radius: 5px;
             font-size: 14px;
+            overflow-x: auto;
+            text-align: left;
         }
         code {
             display: block;
+            text-align: left;
+        }
+        #errorMessage {
+            color: #ff4b4b;
+            margin-top: 10px;
+            font-size: 14px;
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/default.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
 </head>
 <body>
     <h2>SourceViewer</h2>
-    <input type="text" id="urlInput" placeholder="Enter website URL" size="50">
+    <input type="text" id="urlInput" placeholder="Enter website URL">
     <button onclick="fetchSourceCode()">Get Source Code</button>
+    <div id="errorMessage"></div>
     <div id="sourceContainer">
         <pre><code id="sourceCode" class="html"></code></pre>
     </div>
@@ -48,8 +98,11 @@
     <script>
         async function fetchSourceCode() {
             const url = document.getElementById('urlInput').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = "";
+
             if (!url) {
-                alert('Enter a valid URL');
+                errorMessage.textContent = "Enter a valid URL!";
                 return;
             }
             
@@ -58,16 +111,15 @@
             
             try {
                 const response = await fetch(fetchUrl);
-                if (!response.ok) throw new Error('Failed to get the code');
+                if (!response.ok) throw new Error('Failed to fetch the source code');
                 
                 const text = await response.text();
                 const sourceCodeElement = document.getElementById('sourceCode');
                 sourceCodeElement.textContent = text;
                 hljs.highlightElement(sourceCodeElement);
                 
-                document.getElementById('sourceContainer').style.height = 'auto';
             } catch (error) {
-                alert('Smth wrong: ' + error.message);
+                errorMessage.textContent = "Error: " + error.message;
             }
         }
     </script>
