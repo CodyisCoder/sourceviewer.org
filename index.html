@@ -16,6 +16,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            transition: background 0.3s, color 0.3s;
         }
         h2 {
             font-size: 28px;
@@ -64,6 +65,25 @@
             text-align: left;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            position: relative;
+            display: none;
+        }
+        .tools {
+            display: flex;
+            gap: 15px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+        }
+        .tools img {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .tools img:active {
+            transform: scale(0.9);
         }
         pre {
             background: transparent;
@@ -90,7 +110,12 @@
     <input type="text" id="urlInput" placeholder="Enter website URL">
     <button onclick="fetchSourceCode()">Get Source Code</button>
     <div id="errorMessage"></div>
+    
     <div id="sourceContainer">
+        <div class="tools">
+            <img src="copy-icon.png" alt="Copy" onclick="copyToClipboard()">
+            <img src="download-icon.png" alt="Download" onclick="downloadSource()">
+        </div>
         <pre><code id="sourceCode" class="html"></code></pre>
     </div>
     
@@ -98,6 +123,8 @@
         async function fetchSourceCode() {
             const url = document.getElementById('urlInput').value.trim();
             const errorMessage = document.getElementById('errorMessage');
+            const sourceContainer = document.getElementById('sourceContainer');
+            const tools = document.querySelector('.tools');
             errorMessage.textContent = "";
 
             if (!url) {
@@ -116,9 +143,30 @@
                 const sourceCodeElement = document.getElementById('sourceCode');
                 sourceCodeElement.textContent = text;
                 hljs.highlightElement(sourceCodeElement);
+                
+                sourceContainer.style.display = 'block';
+                tools.style.display = 'flex';
             } catch (error) {
                 errorMessage.textContent = "Error: " + error.message;
             }
+        }
+        
+        function copyToClipboard() {
+            const sourceCode = document.getElementById("sourceCode").textContent;
+            navigator.clipboard.writeText(sourceCode).then(() => {
+                alert("Copied to clipboard!");
+            });
+        }
+        
+        function downloadSource() {
+            const sourceCode = document.getElementById("sourceCode").textContent;
+            const blob = new Blob([sourceCode], { type: "text/plain" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "source_code.txt";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
     </script>
 </body>
